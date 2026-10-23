@@ -97,3 +97,59 @@ describe("GET /offers : visibilité selon le profil", () => {
     );
   });
 });
+
+describe("GET /offers : filtre par période", () => {
+  it.each([
+    ["P1", [OFFER.PDF_REPORTS]],
+    ["P2", [
+      OFFER.CLIENT_PORTAL,
+      OFFER.INTERNAL_CHATBOT,
+      OFFER.DATA_QUALITY,
+      OFFER.FLEET_APP,
+      OFFER.BILLING_API,
+      OFFER.CLOUD_MIGRATION,
+      OFFER.ARCHIVE_DIGITIZATION,
+    ]],
+    ["OTHER", [OFFER.CONSULTANT_PLANNING, OFFER.E2E_TESTS]],
+  ] as const)("filtre les offres d'un administrateur avec period=%s", async (period, expected) => {
+    const filtered = await request(app)
+      .get(`/offers?period=${period}`)
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(filtered.status).toBe(200);
+    expect(offerIds(filtered.body)).toEqual(expected);
+  });
+
+  it("combine le filtre de période avec la visibilité d'un étudiant", async () => {
+    const response = await request(app)
+      .get("/offers?period=OTHER")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
+  });
+
+  it("combine le filtre de période avec les offres du déposant", async () => {
+    const response = await request(app)
+      .get("/offers?period=OTHER")
+      .set("Authorization", tokenFor("CONTACT", CONTACT.MARC_LEJEUNE));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.E2E_TESTS]);
+  });
+
+  it.each(["", "P3", "p1", ["P1", "P2"]])(
+    "refuse une valeur period invalide (%s)",
+    async (period) => {
+      const query = Array.isArray(period)
+        ? `/offers?period=${period.join("&period=")}`
+        : `/offers?period=${period}`;
+      const response = await request(app)
+        .get(query)
+        .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+      expect(response.status).toBe(400);
+      expect(response.body.error.code).toBe("INVALID_QUERY");
+    },
+  );
+});
