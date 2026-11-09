@@ -32,6 +32,20 @@ export const OFFER_STATUS_TONES: Record<OfferStatus, StatusTone> = {
   ARCHIVED: "neutral",
 };
 
+export const APPLICATION_STATUS_LABELS = {
+  IN_PROGRESS: "En cours",
+  SELECTED: "Sélectionnée",
+  REJECTED: "Refusée",
+  WITHDRAWN: "Retirée",
+} as const;
+
+export const APPLICATION_STATUS_TONES = {
+  IN_PROGRESS: "warning",
+  SELECTED: "success",
+  REJECTED: "neutral",
+  WITHDRAWN: "neutral",
+} as const satisfies Record<keyof typeof APPLICATION_STATUS_LABELS, StatusTone>;
+
 export const PERIOD_LABELS: Record<PeriodCode, string> = {
   P1: "P1",
   P2: "P2",

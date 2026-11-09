@@ -133,6 +133,20 @@ nouvelles.
 | Page et composants | `frontend/src/pages/OffersPage.tsx`, `OfferTable.tsx` |
 | Tests interface | `frontend/tests/OffersPage.test.tsx`, `NavBar.test.tsx` |
 
+### Gestion des candidatures étudiant
+
+| Couche | Fichier |
+|---|---|
+| Routes | `backend/src/controllers/applications.controller.ts` (`POST/GET /applications`, `DELETE /applications/:id`) |
+| Service | `backend/src/services/applications.service.ts` (offre publiée, propriétaire, transitions) |
+| Repository | `backend/src/repositories/applications.repository.ts` |
+| Modèles et mapper | `backend/src/models/application.ts`, `backend/src/mappers/application.mapper.ts` |
+| Migration | `backend/src/db/migrations/002_applications_constraints.sql` |
+| Frontend | `frontend/src/pages/ApplicationsPage.tsx`, `frontend/src/hooks/useApplications.ts` |
+
+Une candidature retirée est conservée pour l'historique. L'index unique partiel empêche
+les doublons actifs et autorise une nouvelle tentative après `WITHDRAWN`.
+
 ## Tests
 
 - Backend (`backend/tests/`) : Vitest et Supertest sur une base SQLite en mémoire, jamais
