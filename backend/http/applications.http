@@ -1,0 +1,19 @@
+@studentToken = replace-with-student-token
+
+### Candidater à une offre publiée
+POST http://localhost:3000/applications
+Authorization: {{studentToken}}
+Content-Type: application/json
+
+{
+  "offerId": 3,
+  "message": "Je souhaite proposer ma candidature."
+}
+
+### Consulter ses candidatures
+GET http://localhost:3000/applications
+Authorization: {{studentToken}}
+
+### Retirer une candidature
+DELETE http://localhost:3000/applications/1
+Authorization: {{studentToken}}
