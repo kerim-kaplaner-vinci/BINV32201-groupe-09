@@ -153,3 +153,64 @@ describe("GET /offers : filtre par période", () => {
     },
   );
 });
+
+describe("GET /offers : recherche par mot-clé dans le titre", () => {
+  it("cherche une expression dans le titre, sans casse ni espaces externes", async () => {
+    const response = await request(app)
+      .get("/offers?q=%20%20APPLICATION%20REACT%20%20")
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.FLEET_APP]);
+  });
+
+  it("combine la recherche avec la période et conserve la visibilité publiée", async () => {
+    const response = await request(app)
+      .get("/offers?period=P2&q=application")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([OFFER.FLEET_APP]);
+  });
+
+  it("ignore une recherche vide", async () => {
+    const response = await request(app)
+      .get("/offers?q=%20%20%20")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(offerIds(response.body)).toEqual([
+      OFFER.INTERNAL_CHATBOT,
+      OFFER.DATA_QUALITY,
+      OFFER.FLEET_APP,
+      OFFER.BILLING_API,
+    ]);
+  });
+
+  it("retourne une liste vide sans correspondance", async () => {
+    const response = await request(app)
+      .get("/offers?q=aucune-offre-correspondante")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.LUCAS_DUPONT));
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
+  });
+
+  it("refuse une recherche de plus de 100 caractères", async () => {
+    const response = await request(app)
+      .get(`/offers?q=${"a".repeat(101)}`)
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("INVALID_QUERY");
+  });
+
+  it("refuse un paramètre q répété", async () => {
+    const response = await request(app)
+      .get("/offers?q=application&q=react")
+      .set("Authorization", tokenFor("ADMIN", ADMINISTRATOR.ANNE_LECLERCQ));
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("INVALID_QUERY");
+  });
+});
