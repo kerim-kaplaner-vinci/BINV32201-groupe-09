@@ -104,4 +104,52 @@ describe("OffersPage", () => {
       expect.anything(),
     ));
   });
+
+  it("transmet une recherche par titre combinée à la période", async () => {
+    const fetchMock = stubFetch({
+      "/api/offers?period=P2&q=application": () =>
+        Response.json([
+          {
+            id: 1,
+            title: "Application React de gestion de flotte",
+            companyShortName: "Lumen Digital",
+            academicYear: "2026-2027",
+            period: "P2",
+            status: "PUBLISHED",
+          },
+        ]),
+      "/api/offers": () => Response.json(offers),
+      "/api/offers?period=P2": () => Response.json(offers),
+    });
+
+    render(<OffersPage user={studentUser} token="jeton" onUnauthorized={vi.fn()} />);
+    await screen.findByText("Refonte du portail client");
+
+    fireEvent.change(screen.getByLabelText("Période"), { target: { value: "P2" } });
+    fireEvent.change(screen.getByLabelText("Rechercher par titre"), {
+      target: { value: " application " },
+    });
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        "/api/offers?period=P2&q=application",
+        expect.anything(),
+      ),
+    );
+  });
+
+  it("affiche un message adapté lorsqu'aucune offre ne correspond", async () => {
+    stubFetch({
+      "/api/offers": () => Response.json([]),
+    });
+
+    render(<OffersPage user={studentUser} token="jeton" onUnauthorized={vi.fn()} />);
+    fireEvent.change(await screen.findByLabelText("Rechercher par titre"), {
+      target: { value: "introuvable" },
+    });
+
+    expect(
+      await screen.findByText("Aucune offre ne correspond à la recherche."),
+    ).toBeInTheDocument();
+  });
 });

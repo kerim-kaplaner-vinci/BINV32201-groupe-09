@@ -172,6 +172,18 @@ describe("applications", () => {
 
     expect(response.status).toBe(404);
     expect(response.body.error.code).toBe("NOT_FOUND");
+
+    const ownerApplications = await request(app)
+      .get("/applications")
+      .set("Authorization", tokenFor("STUDENT", STUDENT.INES_HADDAD));
+
+    expect(ownerApplications.status).toBe(200);
+    expect(ownerApplications.body).toContainEqual(
+      expect.objectContaining({
+        id: APPLICATION.INES_FLEET_APP,
+        status: "IN_PROGRESS",
+      }),
+    );
   });
 
   it("refuse un identifiant de candidature invalide", async () => {

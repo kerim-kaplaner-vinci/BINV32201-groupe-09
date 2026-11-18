@@ -11,6 +11,7 @@ export const useOffers = (
   token: string,
   onUnauthorized: () => void,
   period?: PeriodCode,
+  search = "",
 ) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,24 +20,31 @@ export const useOffers = (
   useEffect(() => {
     const controller = new AbortController();
 
-    getOffers(token, period, controller.signal)
-      .then((data) => {
-        if (!controller.signal.aborted) setOffers(data);
-      })
-      .catch((reason: unknown) => {
-        if (controller.signal.aborted) return;
-        if (isUnauthorized(reason)) {
-          onUnauthorized();
-        } else {
-          setError(reason instanceof Error ? reason.message : "Erreur inconnue");
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setIsLoading(false);
-      });
+    const timeoutId = window.setTimeout(() => {
+      setIsLoading(true);
+      setError(null);
+      getOffers(token, period, search, controller.signal)
+        .then((data) => {
+          if (!controller.signal.aborted) setOffers(data);
+        })
+        .catch((reason: unknown) => {
+          if (controller.signal.aborted) return;
+          if (isUnauthorized(reason)) {
+            onUnauthorized();
+          } else {
+            setError(reason instanceof Error ? reason.message : "Erreur inconnue");
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsLoading(false);
+        });
+    }, search.trim() === "" ? 0 : 300);
 
-    return () => controller.abort();
-  }, [token, onUnauthorized, period]);
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [token, onUnauthorized, period, search]);
 
   return { offers, isLoading, error };
 };
