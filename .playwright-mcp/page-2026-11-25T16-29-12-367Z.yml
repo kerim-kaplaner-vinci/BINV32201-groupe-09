@@ -1,0 +1,49 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]: Gesta
+    - navigation "Navigation principale" [ref=e121]:
+      - link "Accueil" [ref=e122] [cursor=pointer]:
+        - /url: /
+      - link "Offres" [ref=e123] [cursor=pointer]:
+        - /url: /offres
+      - link "Candidatures" [ref=e124] [cursor=pointer]:
+        - /url: /candidatures
+      - link "Entreprises" [ref=e125] [cursor=pointer]:
+        - /url: /entreprises
+    - generic [ref=e126]:
+      - generic [ref=e127]:
+        - strong [ref=e128]: Lucas Dupont
+        - generic [ref=e129]: Étudiant
+      - button "Changer d'utilisateur" [ref=e130] [cursor=pointer]
+  - note [ref=e5]: Mode démo — connexion sans mot de passe, réservée au développement local.
+  - main [ref=e6]:
+    - generic [ref=e135]:
+      - heading "Offres de stage" [level=1] [ref=e136]
+      - paragraph [ref=e137]: Les offres publiées.
+      - text: Période
+      - combobox "Période" [ref=e138]:
+        - option "Toutes les périodes" [selected]
+        - option "P1"
+        - option "P2"
+        - option "Autre"
+      - generic [ref=e139]:
+        - generic [ref=e140]: Rechercher par titre
+        - searchbox "Rechercher par titre" [active] [ref=e141]: application
+      - paragraph [ref=e189]: 1 offre
+      - table [ref=e191]:
+        - rowgroup [ref=e192]:
+          - row [ref=e193]:
+            - columnheader "Titre" [ref=e194]
+            - columnheader "Entreprise" [ref=e195]
+            - columnheader "Année" [ref=e196]
+            - columnheader "Période" [ref=e197]
+            - columnheader "Statut" [ref=e198]
+            - columnheader "Action" [ref=e199]
+        - rowgroup [ref=e200]:
+          - row [ref=e201]:
+            - cell "Application React de gestion de flotte" [ref=e202]
+            - cell "Lumen Digital" [ref=e203]
+            - cell "2026-2027" [ref=e204]
+            - cell "P2" [ref=e205]
+            - cell "Publiée" [ref=e206]
+            - cell [ref=e208]
